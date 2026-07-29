@@ -10,7 +10,8 @@ export type PageRoute =
   | 'blog'
   | 'contact'
   | 'privacy'
-  | 'terms';
+  | 'terms'
+  | 'not-found';
 
 export type ServiceCategory =
   | 'Core Development'

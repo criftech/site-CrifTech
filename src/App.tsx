@@ -15,6 +15,7 @@ import { TeamView } from './views/TeamView';
 import { CareersView } from './views/CareersView';
 import { ContactView } from './views/ContactView';
 import { LegalView } from './views/LegalView';
+import { NotFoundView } from './views/NotFoundView';
 
 import { PageRoute } from './types';
 import { ShieldCheck, Settings, X, PhoneCall, CheckCircle2, AlertCircle, ArrowRight, Mail, User, FileText } from 'lucide-react';
@@ -31,7 +32,8 @@ const ROUTE_TO_PATH: Record<PageRoute, string | ((slug: string) => string)> = {
   blog: '/blog',
   contact: '/contact',
   privacy: '/privacy',
-  terms: '/terms'
+  terms: '/terms',
+  'not-found': '/'
 };
 
 const PATH_TO_ROUTE: Array<{ match: RegExp; route: PageRoute; slug?: (m: RegExpMatchArray) => string }> = [
@@ -95,6 +97,8 @@ function MainAppContent() {
     if (parsed) {
       setCurrentRoute(parsed.route);
       if (parsed.slug) setSelectedSlug(parsed.slug);
+    } else {
+      setCurrentRoute('not-found');
     }
   }, []);
 
@@ -111,9 +115,12 @@ function MainAppContent() {
         return;
       }
       const parsed = parsePath(window.location.pathname);
-      if (!parsed) return;
-      setCurrentRoute(parsed.route);
-      if (parsed.slug) setSelectedSlug(parsed.slug);
+      if (parsed) {
+        setCurrentRoute(parsed.route);
+        if (parsed.slug) setSelectedSlug(parsed.slug);
+      } else {
+        setCurrentRoute('not-found');
+      }
     };
     window.addEventListener('popstate', onPopstate);
     return () => window.removeEventListener('popstate', onPopstate);
@@ -287,6 +294,10 @@ function MainAppContent() {
                 onNavigate={handleNavigate}
                 defaultTab="terms"
               />
+            )}
+
+            {currentRoute === 'not-found' && (
+              <NotFoundView onNavigate={handleNavigate} />
             )}
           </motion.div>
         </AnimatePresence>

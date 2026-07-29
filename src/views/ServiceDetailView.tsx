@@ -3,6 +3,7 @@ import { useSiteData } from '../context/SiteContext';
 import { PageRoute } from '../types';
 import { CtaBanner } from '../components/CtaBanner';
 import { FaqAccordion } from '../components/FaqAccordion';
+import { NotFoundView } from './NotFoundView';
 import { motion } from 'motion/react';
 import { 
   ArrowLeft, 
@@ -30,7 +31,16 @@ export const ServiceDetailView: React.FC<ServiceDetailViewProps> = ({
   onBookCallClick
 }) => {
   const { services } = useSiteData();
-  const service = services.find(s => s.slug === slug) || services[0];
+  const service = services.find(s => s.slug === slug);
+  if (!service) {
+    return (
+      <NotFoundView
+        onNavigate={onNavigate}
+        title="404 — Service not found"
+        message="This service page doesn’t exist. Please check the URL or go back to all services."
+      />
+    );
+  }
 
   return (
     <div className="pt-28 pb-20 bg-white min-h-screen space-y-20">

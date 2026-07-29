@@ -600,8 +600,37 @@ async function configureApp(app: express.Express, options?: { vite?: boolean; st
   } else if (staticServe) {
     const distPath = path.join(process.cwd(), 'dist');
     app.use(express.static(distPath));
+    const spaRoutes: RegExp[] = [
+      /^\/$/i,
+      /^\/services\/?$/i,
+      /^\/services\/[^/]+\/?$/i,
+      /^\/case-studies\/?$/i,
+      /^\/about\/?$/i,
+      /^\/team\/?$/i,
+      /^\/careers\/?$/i,
+      /^\/blog\/?$/i,
+      /^\/contact\/?$/i,
+      /^\/privacy\/?$/i,
+      /^\/terms\/?$/i
+    ];
+
     app.get('*', (req, res) => {
-      res.sendFile(path.join(distPath, 'index.html'));
+      const reqPath = req.path || '/';
+      const fileLike = path.posix.basename(reqPath).includes('.');
+      if (fileLike) {
+        res.status(404).send('Not Found');
+        return;
+      }
+
+      const isSpaRoute = spaRoutes.some((r) => r.test(reqPath));
+      if (isSpaRoute) {
+        res.sendFile(path.join(distPath, 'index.html'));
+        return;
+      }
+
+      res.status(404).sendFile(path.join(distPath, '404.html'), (err) => {
+        if (err) res.status(404).send('Not Found');
+      });
     });
   }
 
