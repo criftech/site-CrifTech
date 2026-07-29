@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { motion } from 'motion/react';
 import { PageRoute } from '../types';
 import { useSiteData } from '../context/SiteContext';
+import { COUNTRY_CALLING_CODES } from '../data/countryCallingCodes';
 import { 
   Mail, 
   Send, 
@@ -26,6 +27,14 @@ interface ContactViewProps {
 
 export const ContactView: React.FC<ContactViewProps> = () => {
   const { addInquiry, services } = useSiteData();
+
+  const flagFromIso2 = (iso2: string) => {
+    const up = String(iso2 || '').trim().toUpperCase();
+    if (!/^[A-Z]{2}$/.test(up)) return '';
+    const a = up.charCodeAt(0) - 65 + 0x1f1e6;
+    const b = up.charCodeAt(1) - 65 + 0x1f1e6;
+    return String.fromCodePoint(a, b);
+  };
 
   const BUDGET_OPTIONS_BY_CURRENCY: Record<string, string[]> = {
     '$': [
@@ -61,7 +70,8 @@ export const ContactView: React.FC<ContactViewProps> = () => {
     name: '',
     email: '',
     company: '',
-    whatsapp: '',
+    whatsappCountryCode: 'US USA +1',
+    whatsappNumber: '',
     currency: '$',
     service: services[0]?.title || 'Custom Web Applications',
     budget: DEFAULT_BUDGET_BY_CURRENCY['$'],
@@ -75,10 +85,17 @@ export const ContactView: React.FC<ContactViewProps> = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (formState.name && formState.email) {
+      const ccDigits = String(formState.whatsappCountryCode || '').replace(/[^0-9]/g, '');
+      const cc = ccDigits ? `+${ccDigits}` : '';
+      const local = String(formState.whatsappNumber || '')
+        .trim()
+        .replace(/[^0-9]/g, '')
+        .replace(/^0+/, '');
+      const phone = cc && local ? `${cc}${local}` : '';
       addInquiry({
         name: formState.name,
         email: formState.email,
-        phone: formState.whatsapp,
+        phone,
         company: formState.company,
         service: formState.service,
         budget: formState.budget,
@@ -92,7 +109,8 @@ export const ContactView: React.FC<ContactViewProps> = () => {
       name: '',
       email: '',
       company: '',
-      whatsapp: '',
+      whatsappCountryCode: '',
+      whatsappNumber: '',
       currency: '$',
       service: services[0]?.title || 'Custom Web Applications',
       budget: DEFAULT_BUDGET_BY_CURRENCY['$'],
@@ -216,16 +234,30 @@ export const ContactView: React.FC<ContactViewProps> = () => {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                   <div>
                     <label className="text-xs font-bold text-slate-800 block mb-1.5">WhatsApp Number</label>
-                    <div className="relative">
-                      <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-xs font-bold text-emerald-600 select-none pointer-events-none">
-                        WA
-                      </span>
+                    <div className="flex items-stretch gap-2">
+                      <input
+                        type="text"
+                        value={formState.whatsappCountryCode}
+                        onChange={(e) => setFormState({ ...formState, whatsappCountryCode: e.target.value })}
+                        list="whatsapp-country-codes"
+                        placeholder="us USA +1"
+                        className="w-44 shrink-0 px-3 py-3.5 rounded-xl border border-slate-200 text-xs font-extrabold focus:border-emerald-500 focus:outline-none bg-white transition-colors"
+                        aria-label="WhatsApp country code"
+                      />
+                      <datalist id="whatsapp-country-codes">
+                        {COUNTRY_CALLING_CODES.map((c) => (
+                          <option
+                            key={`${c.iso2}-${c.dialCode}-${c.country}`}
+                            value={`${flagFromIso2(c.iso2)} ${c.country} ${c.dialCode}`.trim()}
+                          />
+                        ))}
+                      </datalist>
                       <input
                         type="tel"
-                        value={formState.whatsapp}
-                        onChange={(e) => setFormState({ ...formState, whatsapp: e.target.value })}
-                        placeholder="+1 (555) 123-4567"
-                        className="w-full pl-10 pr-4 py-3.5 rounded-xl border border-slate-200 text-xs font-medium focus:border-emerald-500 focus:outline-none bg-white transition-colors"
+                        value={formState.whatsappNumber}
+                        onChange={(e) => setFormState({ ...formState, whatsappNumber: e.target.value })}
+                        placeholder="(3375) 307138"
+                        className="w-full px-4 py-3.5 rounded-xl border border-slate-200 text-xs font-medium focus:border-emerald-500 focus:outline-none bg-white transition-colors"
                       />
                     </div>
                   </div>
@@ -389,7 +421,7 @@ export const ContactView: React.FC<ContactViewProps> = () => {
       {/* FLOATING WHATSAPP ICON BUTTON */}
       <div className="fixed bottom-6 right-6 z-50">
         <a
-          href="https://wa.me/18005552743?text=Hello%20CrifTech%20Engineering%20Team"
+          href="https://wa.me/03375307138?text=Hello%20CrifTech%20Engineering%20Team"
           target="_blank"
           rel="noopener noreferrer"
           aria-label="Chat on WhatsApp"

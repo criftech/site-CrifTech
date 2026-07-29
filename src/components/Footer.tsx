@@ -206,7 +206,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onBookCallClick, onO
 
               <div className="flex items-center gap-3 p-3 rounded-xl bg-slate-900/90 border border-slate-800 text-slate-200">
                 <Phone className="w-4 h-4 text-[#0066FF] shrink-0" />
-                <span className="truncate">criftech@gmail.com</span>
+                <span className="truncate">+923377530718</span>
               </div>
 
               <button

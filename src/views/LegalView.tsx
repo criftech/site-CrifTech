@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { PageRoute } from '../types';
-import { ShieldCheck, FileText, Lock, CheckCircle2, Download, Mail } from 'lucide-react';
+import { ShieldCheck, FileText, Lock, CheckCircle2, Download, Mail, MessageCircle, X } from 'lucide-react';
 
 interface LegalViewProps {
   onNavigate: (route: PageRoute) => void;
@@ -9,6 +9,7 @@ interface LegalViewProps {
 
 export const LegalView: React.FC<LegalViewProps> = ({ onNavigate, defaultTab = 'privacy' }) => {
   const [activeTab, setActiveTab] = useState<'privacy' | 'terms'>(defaultTab === 'privacy' || defaultTab === 'terms' ? defaultTab : 'privacy');
+  const [legalContactOpen, setLegalContactOpen] = useState(false);
 
   return (
     <div className="pt-32 pb-24 bg-gradient-to-b from-slate-50 via-white to-slate-50 min-h-screen space-y-12">
@@ -214,13 +215,14 @@ export const LegalView: React.FC<LegalViewProps> = ({ onNavigate, defaultTab = '
               <p className="text-slate-500">Our team responds within 24 business hours.</p>
             </div>
             <div className="flex items-center gap-3 shrink-0">
-              <a
-                href="mailto:criftech@gmail.com"
+              <button
+                type="button"
+                onClick={() => setLegalContactOpen(true)}
                 className="px-4 py-2.5 rounded-xl bg-[#0066FF] text-white font-bold inline-flex items-center gap-2 hover:bg-[#0052CC] transition-colors shadow-sm"
               >
                 <Mail className="w-3.5 h-3.5" />
                 <span>Contact Legal Team</span>
-              </a>
+              </button>
               <button
                 onClick={() => onNavigate('contact')}
                 className="px-4 py-2.5 rounded-xl bg-slate-50 border border-slate-200 font-bold text-slate-800 hover:bg-slate-100 transition-colors"
@@ -232,6 +234,99 @@ export const LegalView: React.FC<LegalViewProps> = ({ onNavigate, defaultTab = '
 
         </div>
       </section>
+
+      {legalContactOpen && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Contact legal team"
+        >
+          <button
+            type="button"
+            className="absolute inset-0 bg-slate-950/70"
+            onClick={() => setLegalContactOpen(false)}
+            aria-label="Close dialog"
+          />
+          <div className="relative w-full max-w-md rounded-3xl bg-white border border-slate-200 shadow-2xl overflow-hidden">
+            <div className="p-6 border-b border-slate-100 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <div className="w-9 h-9 rounded-2xl bg-blue-50 text-[#0066FF] flex items-center justify-center border border-blue-100">
+                  <ShieldCheck className="w-4 h-4" />
+                </div>
+                <div>
+                  <div className="text-sm font-extrabold text-slate-900">Contact Legal Team</div>
+                  <div className="text-[11px] text-slate-500 font-semibold">Response within 24 hours</div>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setLegalContactOpen(false)}
+                className="w-9 h-9 rounded-2xl bg-slate-50 border border-slate-200 text-slate-700 flex items-center justify-center hover:bg-slate-100 transition-colors"
+                aria-label="Close"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <div className="p-6 space-y-4 text-xs text-slate-600">
+              <p className="leading-relaxed">
+                You can contact us here. Please fill out the Contact Us form and we will reach out to you within 24 hours.
+              </p>
+
+              <div className="space-y-2">
+                <a
+                  href="mailto:criftech@gmail.com"
+                  className="w-full px-4 py-3 rounded-2xl bg-slate-50 border border-slate-200 flex items-center gap-3 hover:bg-slate-100 transition-colors"
+                >
+                  <div className="w-9 h-9 rounded-xl bg-white border border-slate-200 flex items-center justify-center text-[#0066FF]">
+                    <Mail className="w-4 h-4" />
+                  </div>
+                  <div className="flex-1">
+                    <div className="text-[11px] font-extrabold text-slate-900">Email</div>
+                    <div className="text-xs font-bold text-slate-700">criftech@gmail.com</div>
+                  </div>
+                </a>
+
+                <a
+                  href="https://wa.me/03375307138?text=Hello%20CrifTech%20Legal%20Team"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full px-4 py-3 rounded-2xl bg-emerald-50/70 border border-emerald-200 flex items-center gap-3 hover:bg-emerald-50 transition-colors"
+                >
+                  <div className="w-9 h-9 rounded-xl bg-white border border-emerald-200 flex items-center justify-center text-emerald-600">
+                    <MessageCircle className="w-4 h-4" />
+                  </div>
+                  <div className="flex-1">
+                    <div className="text-[11px] font-extrabold text-slate-900">WhatsApp</div>
+                    <div className="text-xs font-bold text-slate-700">+9233775307138</div>
+                  </div>
+                </a>
+              </div>
+
+              <div className="pt-2 flex items-center gap-3">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setLegalContactOpen(false);
+                    onNavigate('contact');
+                  }}
+                  className="flex-1 px-4 py-3 rounded-2xl bg-[#0066FF] text-white font-extrabold hover:bg-[#0052CC] transition-colors shadow-sm"
+                >
+                  Go to Contact Form
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setLegalContactOpen(false)}
+                  className="px-4 py-3 rounded-2xl bg-slate-50 border border-slate-200 font-extrabold text-slate-800 hover:bg-slate-100 transition-colors"
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
